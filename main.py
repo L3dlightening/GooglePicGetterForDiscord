@@ -1,5 +1,7 @@
 import discord
 import configparser
+import re
+import src.get_pic_from_google as gpfg
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -15,17 +17,14 @@ async def on_ready():
 
 @client.event
 async def reply(message):
-    remove_author = message.content.replace("<*>", "")
-    print(message.content)
-    print(remove_author)
-    # msg = f"{message.author.mention} {remove_author} を受け取りました。"
-    # await message.channel.send(msg)
+    remove_author_from_message = re.sub("\<.+?\>", "", message.content)
+    pic = gpfg.get_image_link(remove_author_from_message)
+    await message.channel.send(pic)
+
 
 @client.event
 async def on_message(message):
     if client.user in message.mentions:
         await reply(message)
-    
-
 
 client.run(TOKEN)
